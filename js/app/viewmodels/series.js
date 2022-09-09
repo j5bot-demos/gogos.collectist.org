@@ -13,6 +13,8 @@ define([
 				var series = this;
 				kb.ViewModel.prototype.constructor.apply(series, arguments);
 
+                series.app = org.Collectist.app;
+
 				series.itemsection = ko.computed(function () {
 					var series = this,
 						itemlist = series.itemlist().items(),
@@ -54,7 +56,7 @@ define([
 
 				series.template = ko.computed(function () {
 					var series = this,
-						app = org.Collectist.app;
+                        app = series.app;
 
 					return (series.template && series.template()) ||
 						app.sitehost + '-item-template';
@@ -82,13 +84,17 @@ define([
 			},
 
 			primaryImage: function (number) {
+                var series = this,
+                    app = series.app;
 				number = number.toString().length === 1 ? '0' + number : number;
-				return this.images() + number + ((this.imagetype && this.imagetype()) || '.gif');
+				return app.path + '/' + series.images() + number + ((series.imagetype && series.imagetype()) || '.gif');
 			},
 
 			secondaryImage: function (number, color) {
+                var series = this,
+                    app = series.app;
 				number = number.toString().length === 1 ? '0' + number : number;
-				return this.images() + number + '-color' + (color() + 1) + '.gif';
+				return app.path + '/' + series.images() + number + '-color' + (color() + 1) + '.gif';
 			},
 
 			getChecklist: function () {
@@ -108,7 +114,7 @@ define([
 			},
 
 			animateCollection: function (data, event) {
-				var app = org.Collectist.app,
+				var app = this.app,
 					target = event.target,
 					$logo = $('header .logo'),
 					$img = $(target).parent().children('img'),

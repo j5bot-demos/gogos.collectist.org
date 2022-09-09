@@ -8,9 +8,9 @@
  */
 define([
 	'jquery',
-	'../env/site-alias',
-	'../app/modules/addthis',
-	'../app/modules/checklist/walkthrough'
+	'env/site-alias',
+	'app/modules/addthis',
+	'app/modules/checklist/walkthrough'
 ], function ($, alias, addthisModule, walkthrough) {
 
 	/**
@@ -22,7 +22,10 @@ define([
 	return function (app) {
 
 		// get the hostname for the site, so we show the right one :)
-		app.sitehost = alias(window.location.pathname.substr(1).split('.')[0]);
+        app.path = '/' + window.location.hostname.includes('collectist.org') ? '' : window.location.pathname.split('/')[0];
+        app.sitehost = alias((app.path === '/' ? window.location.hostname : app.path.substring(1)).split('.')[0]);
+
+        app.domain = `${app.sitehost}.collectist.org`;
 
 		/**
 		 * update things in the head of the document: the title and
@@ -35,11 +38,11 @@ define([
 		function updatePage(response, status, xhr) {
 
 			function hideWalkthrough () {
-				window.localStorage.setItem(app.sitehost + '-hide-walkthrough', 'true');
+				window.localStorage.setItem('hide-walkthrough', 'true');
 			}
 
 			function showWalkthrough () {
-				if (window.localStorage.getItem(app.sitehost + '-hide-walkthrough') !== 'true') {
+				if (window.localStorage.getItem('hide-walkthrough') !== 'true') {
 					walkthrough(hideWalkthrough);
 				}
 			}
@@ -60,7 +63,7 @@ define([
 
 		// load the app config for this site
 		$.ajax({
-			url: 'data/' + app.sitehost + '/config.json',
+			url: '/data/' + app.sitehost + '/config.json',
 			type: 'get',
 			contentType: 'application/json',
 			success: updatePage
